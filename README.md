@@ -4,6 +4,8 @@
 
 An advanced AI Agent prompt framework designed to force LLMs to conduct **multi-round, rigorous reasoning integrated with comprehensive research** before answering. It refines the answer through a continuous loop of reflection, reasoning, and targeted search.
 
+> 📖 **v2.0 now available** — Adds an Epistemic Discipline layer, expands analytical lenses from 5 → 7, introduces Boundary-Condition and Comparative lenses, and upgrades Belief Consolidation to Belief Calibration.
+
 [English](#english) | [中文](#中文)
 
 ---
@@ -87,7 +89,7 @@ Any model with strong reasoning and reliable function/tool calling. Prioritize m
 
 Steps:
 
-1. Copy the full prompt from [`Deep Reasoning & Research.md`](./Deep%20Reasoning%20%26%20Research.md) as your System Prompt
+1. Copy the full prompt from [`Deep Reasoning & Research v2.0.md`](./Deep%20Reasoning%20%26%20Research%20v2.0.md) (recommended) or [`Deep Reasoning & Research.md`](./Deep%20Reasoning%20%26%20Research.md) (v1.0) as your System Prompt
 2. Connect one or more search providers from the list above
 3. Ask a complex question, e.g.:
    
@@ -106,7 +108,8 @@ Steps:
 
 ```
 .
-├── Deep Reasoning & Research.md   # Core prompt
+├── Deep Reasoning & Research.md      # Core prompt (v1.0)
+├── Deep Reasoning & Research v2.0.md # Core prompt (v2.0)
 ├── README.md
 └── LICENSE
 ```
