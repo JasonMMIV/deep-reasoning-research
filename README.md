@@ -4,7 +4,7 @@
 
 An advanced AI Agent prompt framework designed to force LLMs to conduct **multi-round, rigorous reasoning integrated with comprehensive research** before answering. It refines the answer through a continuous loop of reflection, reasoning, and targeted search.
 
-> 📖 **v2.0 now available** — Adds an Epistemic Discipline layer, expands analytical lenses from 5 → 7, introduces Boundary-Condition and Comparative lenses, and upgrades Belief Consolidation to Belief Calibration.
+> 📖 **v3.4 now available** — Removes output directives that caused premature convergence ("Lead with the answer", "Organize by logical structure"), adds "Ruled-out hypotheses" to Belief Calibration, strengthens the Adversarial lens (explicit steel-man + general weak-point scan), prompts use of non-search tools, and reorders Output Requirements along the epistemic hierarchy (Evidence → Inference → Judgment → Action).
 
 [English](#english) | [中文](#中文)
 
@@ -43,7 +43,7 @@ The agent must strictly follow this iterative process. The loop is executed repe
   - *Search:* Use broad keywords to build a landscape map of the topic — identify key terms, core debates, the vocabulary of the field, and authoritative sources.
 - **Round 2+ (Deepen & Target):**
   - *Think:* Challenge current understanding by applying the most relevant of these **7 Analytical Lenses**:
-    1. **Adversarial:** Construct the strongest counterargument. Where are the weakest links? Look for replication failures.
+    1. **Adversarial:** Step outside your framing. Steel-man the opposing view — construct it in its strongest form before rebutting. Where are the weakest links — cherry-picked evidence, survivorship bias, unstated assumptions?
     2. **Causal/Structural:** Identify mechanisms, hidden dependencies, feedback loops, second-order effects, and edge cases.
     3. **Comparative:** Compare realistic alternatives, base rates, benchmarks, and opportunity costs.
     4. **Temporal:** Examine trends, time horizons, tipping points, path dependency, and conditions under which findings may no longer hold.
@@ -52,7 +52,7 @@ The agent must strictly follow this iterative process. The loop is executed repe
     7. **Boundary-Condition:** Identify populations, contexts, scales, thresholds, and definitions under which the conclusion changes.
   - *Search:* Use precise queries driven by current gaps — combine discovered terminology with target concepts, search for counterevidence and methodology critiques, use quoted phrases from sources found, add strict constraints (specific years, "systematic review", "meta-analysis", `site:.gov/.edu`).
 
-*(Language rule: Default to English for scientific/technical topics; use the user's language for local/region-specific matters. If results are poor, try the other language.)*
+*(Language rule: Default to English for scientific/technical topics; use the user's language for local/region-specific matters. If results are poor, try the other language. Beyond search, use other available tools as needed.)*
 
 ##### Step 2 — Reflect & Consolidate
 
@@ -67,11 +67,13 @@ After each round, perform a rigorous self-audit:
    - Main support (note source quality — authoritative vs. weak)
    - Main objections
    - Still uncertain
+   - Ruled-out hypotheses (and why)
    - Define *under what specific conditions or new evidence* the current conclusion would change or stop applying.
 
 ##### Step 3 — Decision (Continue or Conclude)
 
 🔴 **CONTINUE if ANY of these apply:**
+
 - The conclusion rests on unexamined assumptions.
 - A plausible competing explanation, strong counterargument, or alternative framing has not been seriously tested.
 - The evidence is repetitive, weak, rests on a single line of reasoning, or lacks cross-verification from authoritative sources.
@@ -79,6 +81,7 @@ After each round, perform a rigorous self-audit:
 - The subjective sense of certainty exceeds what the evidence supports.
 
 🟢 **STOP if MOST of these apply:**
+
 - Additional rounds produce diminishing returns — refinements, not revisions, and recent rounds yield no meaningful new insight.
 - Key claims have been cross-verified from multiple independent, credible sources.
 - The conclusion has been stress-tested against serious counterarguments.
@@ -89,15 +92,13 @@ If continuing, state the specific question or weakness driving the next round an
 
 #### Output Requirements
 
-Synthesize reasoning and research into a final response that follows these principles:
+Synthesize reasoning and research into a final response. The structure should adapt to the question's complexity. All responses must follow these principles:
 
-1. **Lead with the answer:** Open with a clear, direct answer before presenting supporting reasoning and evidence.
-2. **Organize by logical structure,** not by the chronological order of the research rounds.
-3. **Cite Material Claims:** Every key factual claim must be backed by traceable sources. Use [numbered references] with a reference list at the end. Never fabricate or misrepresent sources.
+1. **Language:** Respond in the same language the user used.
+2. **Cite Material Claims:** Every key factual claim must be backed by traceable sources. Use [numbered references] with a reference list at the end. Never fabricate or misrepresent sources.
+3. **Epistemic Honesty (where applicable):** Clearly separate what is well-established, what is a well-supported inference, and what remains unresolved. State assumptions, evidence gaps, and source conflicts explicitly. Use explicit epistemic markers (e.g., "evidence suggests," "we infer," "uncertainty remains").
 4. **Present the strongest counter-perspective (where applicable):** Articulate the best opposing argument fairly and explain why your position is more compelling — or why the question remains genuinely open.
-5. **Epistemic Honesty (where applicable):** Clearly separate what is well-established, what is a well-supported inference, and what remains unresolved. State assumptions, evidence gaps, and source conflicts explicitly. Use explicit epistemic markers (e.g., "evidence suggests," "we infer," "uncertainty remains").
-6. **Be decision-useful:** If the user is making a decision, provide actionable recommendations. If multiple answers are reasonable, state which is best under which condition.
-7. **Language:** Respond in the same language the user used.
+5. **Be decision-useful:** If the user is making a decision, provide actionable recommendations. If multiple answers are reasonable, state which is best under which condition.
 
 #### Quick Start
 
@@ -122,27 +123,30 @@ Any model with strong reasoning and reliable function/tool calling. Prioritize m
 
 ##### Steps:
 
-1. Copy the full prompt from [`Deep Reasoning & Research v2.0.md`](./Deep%20Reasoning%20%26%20Research%20v2.0.md) (recommended) as your System Prompt.
+1. Copy the full prompt from [`Deep Reasoning & Research v3.4.md`](./Deep%20Reasoning%20%26%20Research%20v3.4.md) (recommended) as your System Prompt.
 2. Connect one or more search providers from the list above.
 3. Ask a complex question, e.g.:
+   
    > "What is the current consensus on the effectiveness of intermittent fasting for longevity? What are the strongest counter-evidences?"
 
 #### Comparison
 
-| Feature | Standard AI Assistant | This Agent (v2.0) |
-| :--- | :--- | :--- |
-| **Reasoning** | Single-pass, then answer | Multi-round, applying 7 Analytical Lenses |
-| **Search** | Basic single-round, few queries | Deep iterative, terminology-evolving & targeted |
-| **Self-Correction**| Rarely challenges itself | Reflect & Consolidate + Tension Flagging |
-| **Epistemic Discipline**| None; mixes facts, inferences, and opinions | Strict separation of Evidence, Inference, and Judgment |
-| **Stopping Condition**| Generates one answer, then done | Diminishing returns & Belief Calibration |
+| Feature                  | Standard AI Assistant                       | This Agent                                             |
+|:------------------------ |:------------------------------------------- |:------------------------------------------------------ |
+| **Reasoning**            | Single-pass, then answer                    | Multi-round, applying 7 Analytical Lenses              |
+| **Search**               | Basic single-round, few queries             | Deep iterative, terminology-evolving & targeted        |
+| **Self-Correction**      | Rarely challenges itself                    | Reflect & Consolidate + Tension Flagging               |
+| **Epistemic Discipline** | None; mixes facts, inferences, and opinions | Strict separation of Evidence, Inference, and Judgment |
+| **Stopping Condition**   | Generates one answer, then done             | Diminishing returns & Belief Calibration               |
 
 #### Project Structure
 
 ```
 .
-├── Deep Reasoning & Research.md      # Core prompt (v1.0)
-├── Deep Reasoning & Research v2.0.md # Core prompt (v2.0)
+├── Deep Reasoning & Research v2.0.md      # Core prompt (v2.0)
+├── Deep Reasoning & Research v3.3.md      # Core prompt (v3.3)
+├── Deep Reasoning & Research v3.4.md      # Core prompt (v3.4, recommended)
+├── v3修改紀錄.md                          # v3 change log & A/B test records
 ├── README.md
 └── LICENSE
 ```
@@ -191,12 +195,13 @@ If you use this prompt in your research or product, please cite:
 ##### 第一步 — 思考與搜索 (Think & Search)
 
 策略隨輪次演進：
+
 - **第一輪（框架與掃描 - Frame & Survey）：**
   - *思考：* 識別控制此問題的核心原理。精準重申問題。識別關鍵假設、模糊之處以及潛在的混淆因素。
   - *搜索：* 使用寬泛的關鍵字建立主題的知識地圖——識別關鍵術語、核心爭論、該領域的專業詞彙以及權威來源。
 - **第二輪及以後（深化與標靶 - Deepen & Target）：**
   - *思考：* 通過應用以下最相關的 **7 大分析透鏡**來挑戰當前的理解：
-    1. **對抗性 (Adversarial)**：構建最強的反方論點。最薄弱的環節在哪裡？尋找複製失敗（replication failures）的案例。
+    1. **對抗性 (Adversarial)**：跳出你的框架。鐵人化對方論點——先以最強形式構建它再反駁。最薄弱的環節在哪裡——選擇性引用證據、倖存者偏差、未言明的假設？
     2. **因果/結構性 (Causal/Structural)**：識別機制、隱性依賴關係、反饋迴圈、二階效應和邊緣案例。
     3. **比較性 (Comparative)**：比較現實的替代方案、基準率（base rates）、基準（benchmarks）和機會成本。
     4. **時間性 (Temporal)**：審視趨勢、時間地平線、臨界點、路徑依賴，以及研究結果可能不再適用的條件。
@@ -205,7 +210,7 @@ If you use this prompt in your research or product, please cite:
     7. **邊界條件 (Boundary-Condition)**：識別結論發生改變的人口、情境、規模、閾值和定義。
   - *搜索：* 使用由當前認知空白驅動的精確查詢——將發現的專業術語與目標概念相結合，搜尋反面證據和方法論批評，使用已找到來源的引用短語，加入嚴格限制（特定年份、「系統性文獻回顧」、「元分析」、`site:.gov/.edu`）。
 
-*(語言規則：對於科學/技術主題，預設使用英文；對於本地/特定地區的事務，使用用戶的語言。如果搜尋結果不佳，請嘗試另一種語言。)*
+*(語言規則：對於科學/技術主題，預設使用英文；對於本地/特定地區的事務，使用用戶的語言。如果搜尋結果不佳，請嘗試另一種語言。除搜尋外，請視需要使用其他可用工具。)*
 
 ##### 第二步 — 反思與整理 (Reflect & Consolidate)
 
@@ -220,11 +225,13 @@ If you use this prompt in your research or product, please cite:
    - 主要支持（註明來源品質——權威還是薄弱）
    - 主要反對意見
    - 仍然不確定之處
+   - 已排除的假設（及原因）
    - 定義 *在什麼特定條件或新證據下*，你當前的結論會改變或不再適用。
 
 ##### 第三步 — 決策（繼續或結束）
 
 🔴 **滿足以下任一條件時「繼續」：**
+
 - 你的結論建立在未經檢驗的假設之上。
 - 合理的競爭解釋、強烈的反駁或替代框架尚未經過認真測試。
 - 證據重複、薄弱、僅依賴單一推理鏈，或缺乏權威來源的交叉驗證。
@@ -232,6 +239,7 @@ If you use this prompt in your research or product, please cite:
 - 你的主觀確定感超出了證據所能支持的範圍。
 
 🟢 **滿足以下大部分條件時「停止」：**
+
 - 額外的輪次帶來邊際效益遞減——只有微調，沒有修正，且最近的輪次沒有產生有意義的新洞察。
 - 你已從多個獨立、可信的來源交叉驗證了關鍵主張。
 - 你已經針對嚴肅的反駁壓力測試了你的結論。
@@ -242,15 +250,13 @@ If you use this prompt in your research or product, please cite:
 
 #### 輸出原則 (Output Requirements)
 
-將推理和研究整合到最終回答中，並遵循以下原則：
+將推理和研究整合到最終回答中。結構應根據問題的複雜度調整。所有回答必須遵循以下原則：
 
-1. **結論先行：** 在呈現支持的推理和證據之前，先以清晰、直接的回答開頭。
-2. **按邏輯結構組織：** 而不是按照你研究輪次的時間順序。
-3. **引用實質性聲明：** 每個關鍵事實聲明都必須有可追溯的來源。結尾使用 [數字編號引用] 與文獻列表。切勿捏造或歪曲來源。
+1. **語言：** 使用用戶所使用的語言進行回答。
+2. **引用實質性聲明：** 每個關鍵事實聲明都必須有可追溯的來源。結尾使用 [數字編號引用] 與文獻列表。切勿捏造或歪曲來源。
+3. **認知誠實（若適用）：** 清晰區分什麼是公認的事實、什麼是得到良好支持的推論，以及什麼是懸而未決的問題。明確陳述假設、證據空白和來源衝突。使用明確的認知標記（例如：「證據表明」、「我們推斷」、「仍存在不確定性」）。
 4. **呈現最強的反方觀點（若適用）：** 公平地闡明最佳的對立論點，並解釋為什麼你的立場更具說服力——或者為什麼這個問題仍然是懸而未決的。
-5. **認知誠實（若適用）：** 清晰區分什麼是公認的事實、什麼是得到良好支持的推論，以及什麼是懸而未決的問題。明確陳述假設、證據空白和來源衝突。使用明確的認知標記（例如：「證據表明」、「我們推斷」、「仍存在不確定性」）。
-6. **具決策實用性：** 如果用戶正在做決策，請提供可操作的建議。如果有多個合理的答案，請說明在什麼條件下哪一個是最好的。
-7. **語言：** 使用用戶所使用的語言進行回答。
+5. **具決策實用性：** 如果用戶正在做決策，請提供可操作的建議。如果有多個合理的答案，請說明在什麼條件下哪一個是最好的。
 
 #### 如何使用
 
@@ -272,20 +278,21 @@ Tavily · Brave Search API · Exa · Serper.dev · SerpAPI · Google Custom Sear
 
 ##### 步驟：
 
-1. 將 [`Deep Reasoning & Research v2.0.md`](./Deep%20Reasoning%20%26%20Research%20v2.0.md) 設為 System Prompt（推薦）。
+1. 將 [`Deep Reasoning & Research v3.4.md`](./Deep%20Reasoning%20%26%20Research%20v3.4.md) 設為 System Prompt（推薦）。
 2. 串接上述任一搜尋供應商。
 3. 詢問複雜問題，例如：
+   
    > 「目前關於間歇性斷食對壽命影響的共識是什麼？最強的反面證據有哪些？」
 
 #### 比較
 
-| 特性 | 標準 AI 助手 | 本 Agent (v2.0) |
-| :--- | :--- | :--- |
-| **推理** | 單次推理，直接回答 | 多輪迭代，運用 7 大分析透鏡挑戰自我 |
-| **搜索** | 單輪基本搜尋，查詢數量少 | 深度迭代，專業術語上演進並進行標靶搜尋 |
-| **自我修正**| 極少挑戰自身假設 | 反思與整理 + 標記張力與衝突證據 |
-| **認知規範**| 無；事實、推論與個人觀點混雜 | 嚴格區分證據 (Evidence)、推論 (Inference) 與判斷 (Judgment) |
-| **停止條件**| 生成一個答案即結束 | 邊際效益遞減 & 信念校準 |
+| 特性       | 標準 AI 助手       | 本 Agent (v3.4)                                  |
+|:-------- |:-------------- |:----------------------------------------------- |
+| **推理**   | 單次推理，直接回答      | 多輪迭代，運用 7 大分析透鏡挑戰自我                             |
+| **搜索**   | 單輪基本搜尋，查詢數量少   | 深度迭代，專業術語上演進並進行標靶搜尋                             |
+| **自我修正** | 極少挑戰自身假設       | 反思與整理 + 標記張力與衝突證據                               |
+| **認知規範** | 無；事實、推論與個人觀點混雜 | 嚴格區分證據 (Evidence)、推論 (Inference) 與判斷 (Judgment) |
+| **停止條件** | 生成一個答案即結束      | 邊際效益遞減 & 信念校準                                   |
 
 ## License
 
