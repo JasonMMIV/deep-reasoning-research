@@ -143,10 +143,8 @@ Any model with strong reasoning and reliable function/tool calling. Prioritize m
 
 ```
 .
-├── Deep Reasoning & Research v2.0.md      # Core prompt (v2.0)
-├── Deep Reasoning & Research v3.3.md      # Core prompt (v3.3)
+├── .gitignore                            # Git ignore rules
 ├── Deep Reasoning & Research v3.4.md      # Core prompt (v3.4, recommended)
-├── v3修改紀錄.md                          # v3 change log & A/B test records
 ├── README.md
 └── LICENSE
 ```
